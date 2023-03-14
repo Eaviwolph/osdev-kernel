@@ -1,5 +1,7 @@
 # osdev-kernel
-A kernel based on the legacy exercice of EPITA with the OSDev tutorial
+A kernel based on the legacy exercice of EPITA with the OSDev tutorial.  
+EPITA base code: https://k.lse.epita.fr/  
+OSDev wiki: https://wiki.osdev.org
 
 ## What has been done
 ### Serial driver
