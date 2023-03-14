@@ -1,0 +1,14 @@
+*.o
+*.d
+iso/
+k.iso
+k/k
+libs/libc/libc.a
+libs/libk/libk.a
+roms/chichehunter/hunter
+roms/chichepong/pong
+roms/chichevaders/vaders
+roms/perrodlauncher/perrod
+roms/skate/skate
+roms/yakanoid/yakanoid
+.vscode
