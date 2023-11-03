@@ -24,7 +24,7 @@ void print_all_gdt()
 void init_gdt_entry(struct gdt *t, u32 base, u32 limit, u8 access,
                     u8 gran)
 {
-    t->base_15_00 = base & 0xFFFF; // First 16 bits
+    t->base_15_00 = base & 0xFFFF;       // First 16 bits
     t->base_23_16 = (base >> 16) & 0xFF; // Next 8 bits
     t->base_31_24 = (base >> 24 & 0xFF); // Last 8 bits
 
@@ -56,7 +56,7 @@ void gdt_full_init(void)
 
     // Loading gdtr
     struct gdtr gdtr;
-    gdtr.base = (u32)gdt; /* gdt base address */
+    gdtr.base = (u32)gdt;         /* gdt base address */
     gdtr.limit = sizeof(gdt) - 1; /* gdt size - 1 */
     asm volatile("lgdt %0\n"
                  : /* no output */

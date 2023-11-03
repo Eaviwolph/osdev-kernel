@@ -35,6 +35,7 @@ OBJS	= \
 	  drivers/keyboard.o \
 	  drivers/timer.o \
 	  drivers/vga.o \
+	  drivers/atapi.o \
 	  gdt/gdt.o \
 	  events/idt.o \
 	  events/irq_asm.o \
