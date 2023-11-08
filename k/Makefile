@@ -46,6 +46,7 @@ OBJS	= \
 	  events/syscall/syscall.o \
 	  events/syscall/test.o \
 	  test/syscalls.o \
+	  fs/kfs.o \
 
 
 DEPS = $(OBJS:.o=.d)

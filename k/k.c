@@ -57,8 +57,6 @@ void k_main(unsigned long magic, multiboot_info_t *info)
     // char star[4] = "|/-\\";
     // char *fb = (void *)0xB8000; // VIDEO_GRAPHIC=0xA0000 VIDEO_TEXT=0xB8000;
 
-    discover_atapi_drive();
-
     char buffer[80 * 25 * 2];
     for (unsigned i = 0; i < 80 * 25 * 2; i++)
     {

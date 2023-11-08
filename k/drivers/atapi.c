@@ -2,6 +2,9 @@
 #include <stdio.h>
 #include "../io.h"
 
+u16 sreg = SECONDARY_REG;
+u16 sdrive = ATA_PORT_SLAVE;
+
 void busy_wait(u16 drive)
 {
     while (inb(ATA_REG_STATUS(drive)) & BSY)
@@ -64,9 +67,6 @@ short is_atapi_drive(u16 bus, u8 slave)
     return 0;
 }
 
-u16 sreg = SECONDARY_REG;
-u16 sdrive = ATA_PORT_SLAVE;
-
 void discover_atapi_drive()
 {
     outb(PRIMARY_DCR, INTERRUPT_DISABLE);
@@ -90,4 +90,58 @@ void discover_atapi_drive()
             }
         }
     }
+}
+
+void send_packet(struct SCSI_packet *pkt, u16 drive)
+{
+    busy_wait(drive);
+    outb(ATA_REG_FEATURES(drive), 0);
+    outb(ATA_REG_SECTOR_COUNT(drive), 0);
+    outb(ATA_REG_LBA_MI(drive), CD_BLOCK_SZ);
+    outb(ATA_REG_LBA_HI(drive), CD_BLOCK_SZ >> 8);
+    outb(ATA_REG_COMMAND(drive), PACKET);
+    wait_packet_request(drive);
+
+    for (u16 *i = pkt; i < pkt + 1; i++)
+    {
+        outw(ATA_REG_DATA(drive), *i);
+    }
+
+    while (inb(ATA_REG_SECTOR_COUNT(drive)) & PACKET_DATA_TRANSMIT)
+        ;
+}
+
+void read_block(size_t lba, u16 *buffer, size_t size)
+{
+    struct SCSI_packet pkt;
+    pkt.control = 0;
+    pkt.flags_hi = 0;
+    pkt.transfer_length_lo = 1;
+    pkt.transfer_length_milo = 0;
+    pkt.transfer_length_mihi = 0;
+    pkt.transfer_length_hi = 0;
+    pkt.lba_lo = lba & 0xFF;
+    pkt.lba_milo = (lba >> 8) & 0xFF;
+    pkt.lba_mihi = (lba >> 16) & 0xFF;
+    pkt.lba_hi = (lba >> 24) & 0xFF;
+    pkt.flags_lo = 0;
+    pkt.op_code = READ_12;
+
+    send_packet(&pkt, sdrive);
+
+    for (u16 i = 0; i < size; i++)
+    {
+        /* Wait until data is ready */
+        wait_packet_request(sdrive);
+        buffer[i] = inw(ATA_REG_DATA(sdrive));
+
+        /* Wait until data is transmitted */
+        while (inb(ATA_REG_SECTOR_COUNT(sdrive)) & PACKET_COMMAND_COMPLETE)
+            ;
+    }
+}
+
+void init_atapi()
+{
+    discover_atapi_drive();
 }
