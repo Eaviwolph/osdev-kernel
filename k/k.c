@@ -42,6 +42,8 @@ void k_main(unsigned long magic, multiboot_info_t *info)
     (void)info;
 
     serial_init();
+    printf("Hello World\r\n");
+
     gdt_init();
     pic_init();
     idt_init();

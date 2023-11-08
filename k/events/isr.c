@@ -39,9 +39,9 @@ char *exception_messages[32] =
 
 void isr_handler(registers_t *regs)
 {
-    printf("INT NUM: %d\r\n", regs->eax);
     if (regs->int_no == 0x80)
     {
+        printf("INT NUM: %d\r\n", regs->eax);
         syscall_handler(regs);
     }
     else

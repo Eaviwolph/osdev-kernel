@@ -49,7 +49,7 @@ void gdt_full_init(void)
     // A userland data segment
     init_gdt_entry(&gdt[4], 0, 0xFFFFFFFF, 0xF2, 0xCF);
 
-    print_all_gdt();
+    //print_all_gdt();
 
     // stopping all interrupts
     __asm__ volatile("cli");
