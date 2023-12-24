@@ -21,14 +21,15 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+#include <drivers/atapi.h>
+#include <drivers/keyboard.h>
 #include <drivers/pic.h>
 #include <drivers/serial.h>
 #include <drivers/timer.h>
-#include <drivers/keyboard.h>
 #include <drivers/vga.h>
-#include <drivers/atapi.h>
 #include <events/idt.h>
 #include <events/syscall.h>
+#include <fs/kfs.h>
 #include <gdt/gdt.h>
 #include <k/kstd.h>
 #include <stdio.h>
@@ -41,6 +42,8 @@ void k_main(unsigned long magic, multiboot_info_t *info)
     (void)magic;
     (void)info;
 
+    printf("magic: %x\r\n", magic);
+
     serial_init();
     printf("Hello World\r\n");
 
@@ -50,6 +53,9 @@ void k_main(unsigned long magic, multiboot_info_t *info)
     keyboard_init();
     timer_init();
     syscall_init();
+    init_atapi();
+    // // The superblock is the first block of the file system (offset 0).
+    kfs_init();
 
     // After this point, the code is used to test the kernel
     writetest("Hello World\r\n", 13);

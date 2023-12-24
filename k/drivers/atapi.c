@@ -1,9 +1,9 @@
+#include "../io.h"
 #include <k/atapi.h>
 #include <stdio.h>
-#include "../io.h"
 
-u16 sreg = SECONDARY_REG;
-u16 sdrive = ATA_PORT_SLAVE;
+static u16 sreg = SECONDARY_REG;
+static u16 sdrive = ATA_PORT_SLAVE;
 
 void busy_wait(u16 drive)
 {
@@ -19,8 +19,12 @@ void wait_device_selection(u16 drive)
 
 void wait_packet_request(u16 drive)
 {
-    while (!(inb(ATA_REG_STATUS(drive)) & DRQ))
-        ;
+    while (1)
+    {
+        int status = inb(ATA_REG_STATUS(drive));
+        if (!(status & BSY) && (status & DRQ))
+            break;
+    }
 }
 
 void ata_io_wait(u16 drive)
@@ -100,6 +104,9 @@ void send_packet(struct SCSI_packet *pkt, u16 drive)
     outb(ATA_REG_LBA_MI(drive), CD_BLOCK_SZ);
     outb(ATA_REG_LBA_HI(drive), CD_BLOCK_SZ >> 8);
     outb(ATA_REG_COMMAND(drive), PACKET);
+
+    ata_io_wait(drive);
+    busy_wait(drive);
     wait_packet_request(drive);
 
     for (u16 *i = pkt; i < pkt + 1; i++)
@@ -127,17 +134,23 @@ void read_block(size_t lba, u16 *buffer, size_t size)
     pkt.flags_lo = 0;
     pkt.op_code = READ_12;
 
+    printf("Sending packet\r\n");
     send_packet(&pkt, sdrive);
+    printf("Packet sent\r\n");
 
     for (u16 i = 0; i < size; i++)
     {
+        printf("Reading data\r\n");
         /* Wait until data is ready */
         wait_packet_request(sdrive);
+        printf("Data ready\r\n");
         buffer[i] = inw(ATA_REG_DATA(sdrive));
 
+        printf("Data read\r\n");
         /* Wait until data is transmitted */
         while (inb(ATA_REG_SECTOR_COUNT(sdrive)) & PACKET_COMMAND_COMPLETE)
             ;
+        printf("Data transmitted\r\n");
     }
 }
 

@@ -1,6 +1,6 @@
 #include <drivers/pic.h>
-#include <events/irq.h>
 #include <events/idt.h>
+#include <events/irq.h>
 #include <k/kstd.h>
 #include <stdio.h>
 

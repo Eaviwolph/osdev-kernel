@@ -37,12 +37,12 @@
 #define ATA_REG_STATUS(PORT) ((PORT) + 7)
 
 /* Status bits */
-#define ERR (1 << 0)
-#define DRQ (1 << 3)
-#define SRV (1 << 4)
-#define DF (1 << 5)
-#define RDY (1 << 6)
-#define BSY (1 << 7)
+#define ERR (1 << 0) // 0x1
+#define DRQ (1 << 3) // 0x8
+#define SRV (1 << 4) // 0x10
+#define DF (1 << 5)  // 0x20
+#define RDY (1 << 6) // 0x40
+#define BSY (1 << 7) // 0x80
 
 #define ABRT (1 << 2)
 
@@ -69,7 +69,8 @@
 #define PACKET_DATA_TRANSMIT 2
 #define PACKET_COMMAND_COMPLETE 3
 
-struct SCSI_packet {
+struct SCSI_packet
+{
   u8 op_code;
   u8 flags_lo;
   u8 lba_hi;
